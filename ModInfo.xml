@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+    <ModInfo>
+        <Name value="Performance Tracker"/>
+        <Description value="Tracks performance impact of all loaded mods and vanilla game functions"/>
+        <Author value="B.R. Brainerd"/>
+        <Version value="1.0.0"/>
+        <Website value=""/>
+    </ModInfo>
+</xml>

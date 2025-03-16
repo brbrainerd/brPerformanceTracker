@@ -1,0 +1,15 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\src\PerformanceTracker.cs(179,54): error CS1503: Argument 1: cannot convert from 'string' to 'System.Collections.Generic.SortedList<string, IConsoleCommand>' [C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\PerformanceTracker.csproj]
+C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\src\PerformanceTracker.cs(179,69): error CS1503: Argument 2: cannot convert from 'method group' to 'string' [C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\PerformanceTracker.csproj]
+C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\src\PerformanceTracker.cs(179,95): error CS1503: Argument 3: cannot convert from 'string' to 'IConsoleCommand' [C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\PerformanceTracker.csproj]
+
+Build FAILED.
+
+C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\src\PerformanceTracker.cs(179,54): error CS1503: Argument 1: cannot convert from 'string' to 'System.Collections.Generic.SortedList<string, IConsoleCommand>' [C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\PerformanceTracker.csproj]
+C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\src\PerformanceTracker.cs(179,69): error CS1503: Argument 2: cannot convert from 'method group' to 'string' [C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\PerformanceTracker.csproj]
+C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\src\PerformanceTracker.cs(179,95): error CS1503: Argument 3: cannot convert from 'string' to 'IConsoleCommand' [C:\Program Files (x86)\Steam\steamapps\common\7 Days To Die\Mods\PerformanceTracker\PerformanceTracker.csproj]
+    0 Warning(s)
+    3 Error(s)
+
+Time Elapsed 00:00:01.31
