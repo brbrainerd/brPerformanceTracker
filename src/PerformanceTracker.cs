@@ -24,7 +24,7 @@ namespace PerformanceTracker
         private static List<Assembly> loadedModAssemblies = new List<Assembly>();
         private static long maxLogFileSizeBytes = 100 * 1024 * 1024; // 100MB
         private static int maxLogFileCount = 10; // Maximum number of rolling log files to keep
-        private static int reportingIntervalSeconds = 60; // How often to automatically report performance
+        private static int reportingIntervalSeconds = 15; // How often to automatically report performance
         private static float lastReportTime = 0f;
         
         // Basic performance metrics
@@ -448,7 +448,22 @@ namespace PerformanceTracker
             string gpuMemory = $"GPU Memory Usage: {lastGpuMemoryUsage:F2} MB";
             string drawCalls = $"Draw Calls: {lastDrawCalls}";
             string gpuTime = $"GPU Frame Time: {lastGpuFrameTime:F2} ms";
-            string topMethodsHeader = "Top 10 methods by last frame execution time:";
+            
+            // Calculate per-mod memory usage estimates
+            var modMemoryUsage = methodPerformanceData.Values
+                .GroupBy(m => m.IsVanilla ? "Vanilla" : m.ModName)
+                .Select(g => new {
+                    ModName = g.Key,
+                    MemoryUsage = g.Sum(m => m.LastFrameMemoryUsage) / g.Count(), // Average memory per method * method count
+                    GpuMemoryUsage = g.Sum(m => m.LastFrameGpuMemoryUsage) / g.Count(),
+                    DrawCalls = g.Sum(m => m.LastDrawCalls),
+                    TotalMethods = g.Count(),
+                    TotalCalls = g.Sum(m => m.LastFrameCalls)
+                })
+                .OrderByDescending(m => m.MemoryUsage)
+                .ToList();
+
+            string modResourceHeader = "\n===== MOD RESOURCE CONSUMPTION =====";
             
             // Always log to Unity debug log
             UnityEngine.Debug.Log(header);
@@ -458,6 +473,20 @@ namespace PerformanceTracker
             UnityEngine.Debug.Log(gpuMemory);
             UnityEngine.Debug.Log(drawCalls);
             UnityEngine.Debug.Log(gpuTime);
+            UnityEngine.Debug.Log(modResourceHeader);
+            
+            foreach (var mod in modMemoryUsage)
+            {
+                string modResourceInfo = $"{mod.ModName}:\n" +
+                    $"  Memory: {mod.MemoryUsage:F2} MB\n" +
+                    $"  GPU Memory: {mod.GpuMemoryUsage:F2} MB\n" +
+                    $"  Draw Calls: {mod.DrawCalls}\n" +
+                    $"  Methods: {mod.TotalMethods}\n" +
+                    $"  Calls/Frame: {mod.TotalCalls}";
+                UnityEngine.Debug.Log(modResourceInfo);
+            }
+            
+            string topMethodsHeader = "\nTop 10 methods by last frame execution time:";
             UnityEngine.Debug.Log(topMethodsHeader);
             
             // Also output to console if requested
@@ -470,6 +499,18 @@ namespace PerformanceTracker
                 SdtdConsole.Instance.Output(gpuMemory);
                 SdtdConsole.Instance.Output(drawCalls);
                 SdtdConsole.Instance.Output(gpuTime);
+                SdtdConsole.Instance.Output(modResourceHeader);
+                
+                foreach (var mod in modMemoryUsage)
+                {
+                    SdtdConsole.Instance.Output($"{mod.ModName}:");
+                    SdtdConsole.Instance.Output($"  Memory: {mod.MemoryUsage:F2} MB");
+                    SdtdConsole.Instance.Output($"  GPU Memory: {mod.GpuMemoryUsage:F2} MB");
+                    SdtdConsole.Instance.Output($"  Draw Calls: {mod.DrawCalls}");
+                    SdtdConsole.Instance.Output($"  Methods: {mod.TotalMethods}");
+                    SdtdConsole.Instance.Output($"  Calls/Frame: {mod.TotalCalls}");
+                }
+                
                 SdtdConsole.Instance.Output(topMethodsHeader);
             }
             
@@ -1042,7 +1083,21 @@ namespace PerformanceTracker
                         string modContext = "";
                         if (modPerformanceImpact.TryGetValue(isVanilla ? "Vanilla" : modName, out float modImpact))
                         {
-                            modContext = $"\nMod Total Impact: {modImpact:F2}ms";
+                            // Get detailed resource usage for this mod
+                            var modMethods = methodPerformanceData.Values
+                                .Where(m => (m.IsVanilla == isVanilla) && (m.IsVanilla ? true : m.ModName == modName))
+                                .ToList();
+                                
+                            float avgMemory = modMethods.Average(m => m.LastFrameMemoryUsage);
+                            float avgGpuMemory = modMethods.Average(m => m.LastFrameGpuMemoryUsage);
+                            int totalDrawCalls = modMethods.Sum(m => m.LastDrawCalls);
+                            
+                            modContext = $"\nMod Performance Impact:" +
+                                $"\n - Total Impact: {modImpact:F2}ms" +
+                                $"\n - Memory Usage: {avgMemory:F2} MB" +
+                                $"\n - GPU Memory: {avgGpuMemory:F2} MB" +
+                                $"\n - Draw Calls: {totalDrawCalls}" +
+                                $"\n - Active Methods: {modMethods.Count}";
                             
                             // Add information about other heavy methods from this mod
                             var otherHeavyMethods = methodPerformanceData.Values
